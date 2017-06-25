@@ -1,0 +1,194 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * {
+      margin: 0;
+    }
+
+    p {
+      font-family: verdana, arial, helvetica, sans-serif;
+      font-size: 16px;
+      padding-bottom: 20px;
+    }
+
+    .table {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+    }
+
+    .table .lights {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: black;
+      border: 2px solid;
+    }
+
+    .lights.highlighted {
+      background-color: yellow;
+    }
+
+    .container {
+      display: flex;
+      height: 30px;
+      margin-bottom: 30px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .query {
+      border: 2px solid;
+      flex-basis: 30px;
+      margin-left: 20px;
+      background-color: white;
+    }
+
+    .query.highlighted {
+      background-color: green;
+    }
+  </style>
+
+  <title>THE LIGHTS OF THE ROUND TABLE</title>
+</head>
+<body>
+  <!--<header style="display: flex; align-items: center; justify-content: center; height: 70px">
+    <h1 style="font-size: 30px">THE LIGHTS OF THE ROUND TABLE</h1>
+  </header>-->
+  <section style="width: 800px; margin: 20px auto; text-align: justify">
+    <h1 style="font-style: 30px; text-align: center; padding-bottom: 30px">
+      THE LIGHTS OF THE ROUND TABLE
+    </h1>
+    <p>
+      King Arthur is preparing for a meeting of the round table. The seats at the round table are
+      numbered <em>1</em> through <em>n</em>. Each seat has a reading lamp and when Arthur goes into the round table
+      room he finds that someone has switched off some of the reading lamps. Being a king, Arthur
+      cannot simply switch on those lights that are currently off. He has to tell somebody else to do
+      it.
+    </p>
+    
+    <p>
+      So Arthur has to write down a list of numbers of seats and then get a servant to flip the switch
+      on each light that is listed. The next meeting is to discuss the banishment of Merlin and the
+      meeting can only start when all of the lights are turned on. Using a crystal ball Merlin can see
+      the list of numbers that the king has written and is able to rotate the table before the servant
+      gets there.
+    </p>
+
+    <p>
+      So for example, if <em>n = 100</em> and the king asks for <em>3, 28, 97</em> to be flipped, then if Merlin rotates
+      the table by <em>10</em> places, the servant will in fact flip the switch on lamps that were in positions
+      <em>93, 18, 87</em> and so may flip the switch on a light that is already on. The servant is not allowed to
+      use common-sense. Disobeying the kings instructions can be hazardous to ones health.
+    </p>
+    
+    <p>
+      Game inspired by: <a href="https://www.cs.cmu.edu/puzzle/puzzle2.html">Puzzle Toad</a>
+    </p>
+
+    <h3 style="font-size: 30px; text-align: center; margin: 20px">Round Table</h3>
+
+    <div class="table">
+      <div class="lights"></div>
+      <div class="lights"></div>
+      <div class="lights"></div>
+      <div class="lights"></div>
+      <div class="lights"></div>
+      <div class="lights"></div>
+      <div class="lights"></div>
+      <div class="lights"></div>
+    </div>
+
+    <script>
+      var nodes = document.querySelectorAll('.table .lights');
+      var angleFactor = 2 * Math.PI / nodes.length;
+      var radius = 120;
+
+      nodes.forEach(function(node, i) {
+        var angle = angleFactor * i;
+        var x = radius * Math.cos(angle);
+        var y =-radius * Math.sin(angle);
+        var left = x + 150 - 17;
+        var top = y + 150 - 17;
+
+        node.style.left = `${left}px`;
+        node.style.top = `${top}px`;
+      });
+    </script>
+
+    <p style="display: inline-block">Number of attempts: &nbsp</p><p style="display: inline-block" id="attemptCount">0</p>
+
+    <div class="container">
+      <div class="query" data-id="0"></div>
+      <div class="query" data-id="1"></div>
+      <div class="query" data-id="2"></div>
+      <div class="query" data-id="3"></div>
+      <div class="query" data-id="4"></div>
+      <div class="query" data-id="5"></div>
+      <div class="query" data-id="6"></div>
+      <div class="query" data-id="7"></div>
+    </div>
+
+    <div style="text-align: center">
+      <button onClick="submit()">submit</button>
+      <button onClick="reset()">reset</button>
+    </div>
+  </section>
+
+  <script>
+    var reset = function() {
+      // reset attempt count
+      var attemptCount = document.getElementById('attemptCount');
+      attemptCount.innerHTML = 0;
+
+      // reset lights configuration
+      for (var light of lights)
+        if (Math.random() < 0.5)
+          light.classList.toggle('highlighted');
+
+      // clear query
+      for (var node of nodes)
+        node.classList.remove('highlighted');
+    }
+
+    var submit = function() {
+      // increment attempt count
+      var attemptCount = document.getElementById('attemptCount');
+      var value = attemptCount.innerHTML; value++;
+      attemptCount.innerHTML = value;
+
+      var length = (Math.random() * nodes.length) | 0;
+
+      console.log(length);
+
+      for (var node of nodes) 
+        if (node.classList.contains('highlighted')) 
+          lights[(+node.dataset.id + length) % nodes.length].classList.toggle('highlighted');
+
+      for (var light of lights)
+        if (!light.classList.contains('highlighted'))
+          return false;
+
+      alert('Congratulations, you have solved the puzzle in ' + attemptCount.innerHTML + ' submissions!');
+    }    
+
+    var eventHandler = function(event) {
+      event.preventDefault();
+
+      event.target.classList.toggle('highlighted');
+    }
+
+    var nodes = document.querySelectorAll('.query[data-id]');
+
+    var lights = document.querySelectorAll('.lights');
+
+    document.body.onload = reset;
+
+    nodes.forEach(function(node) {
+      node.addEventListener('click', eventHandler);
+    });
+  </script>
+</body>
