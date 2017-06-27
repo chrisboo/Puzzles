@@ -1,0 +1,178 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * {
+      margin: 0;
+    }
+
+    p {
+      font-family: verdana, arial, helvetica, sans-serif;
+      font-size: 16px;
+      padding-bottom: 20px;
+    }
+
+    .table {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+    }
+
+    .table .lights {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: black;
+      border: 2px solid;
+    }
+
+    .lights.highlighted {
+      background-color: yellow;
+    }
+
+    .grid {
+      height: 480px;
+    }
+
+    .row {
+      display: flex;
+      height: 54px;
+      margin-top: 5px;
+      justify-content: center;
+    }
+
+    .column {
+      flex-basis: 50px;
+      border: 2px black solid;
+      margin-left: 5px;
+      background-color: green;
+      text-align: center;
+      line-height: 50px;
+      font-size: 30px;
+      color: green;
+    }
+
+    .column.highlighted {
+      background-color: white;
+      color: black;
+    }
+  </style>
+
+  <title>THE T.M. RIDDLE'S DIARY</title>
+</head>
+<body>
+  <section style="width: 800px; margin: 20px auto; text-align: justify">
+    <h1 style="font-style: 30px; text-align: center; padding-bottom: 30px">
+      THE T.M. RIDDLE'S DIARY
+    </h1>
+
+    <p>
+      Lord Voldemort had hidden one of his horcrux - a secret number - in one of the page in T.M. Riddle's Diary. The page
+      contains an 8x8 grid which is sorted in a row wise and column wise manner. The top-left and the bottom-right cells 
+      store the smallest and largest number respectively. Furthermore, the entries are casted with concealing charms to 
+      make them invisible from naked human eyes.
+    </p>
+    
+    <p>
+      You are in a mission to destroy the hocrux. You have found the diary and the page that contains the secret number. Now, you 
+      need to cast revealing charms to force the entries to appear. As your power is limited, each spell cast can only 
+      reveal one of the entry of your choice. Identify the position of the secret number using as little revealing charms as possible!
+    </p>
+
+    <h3 style="font-size: 30px; text-align: center; margin: 20px">A Page in T.M. Riddle's Diary</h3>
+
+    <p style="display: inline-block">The secret number is &nbsp</p><p style="display: inline-block" id="secretNumber">0</p>
+
+    <div class="grid"></div>
+
+    <script>
+      var grid = document.querySelector('.grid');
+      for (var i = 0; i < 8; i++) {
+        var row = document.createElement('div');
+        row.classList.add('row');
+        for (var j = 0; j < 8; j++) {
+          var col = document.createElement('div');
+          col.classList.add('column');
+          col.dataset.id = '' + (8 * i + j);
+
+          row.appendChild(col);
+        }
+        grid.appendChild(row);
+      }
+    </script>
+
+    <p style="display: inline-block">Number of revealing charms casted: &nbsp</p><p style="display: inline-block" id="attemptCount">0</p>
+
+    <div style="text-align: center">
+      <button onClick="reset()">reset</button>
+    </div>
+  </section>
+
+  <script>
+    var nodes = document.querySelectorAll('.row .column');
+    var entries = new Array(8);
+    for (var i = 0; i < 8; i++) {
+      entries[i] = new Array(8);
+    }
+
+    var reset = function() {
+      for (var i = 0; i < 8; i++) {
+        for (var j = 0; j < 8; j++) {
+          if (i === 0 && j === 0) {
+            entries[i][j] = (Math.random() * 3) | 0;
+          } else if (i === 0) {
+            entries[i][j] = entries[i][j-1] + (Math.random() * 5) | 0;
+          } else if (j === 0) {
+            entries[i][j] = entries[i-1][j] + (Math.random() * 5) | 0;
+          } else {
+            entries[i][j] = Math.max(entries[i][j-1], entries[i-1][j]) + (Math.random() * 5) | 0;
+          }
+        }
+      }
+
+      // reset secret number
+      var secretNumber = document.getElementById('secretNumber');
+      secretNumber.innerHTML = entries[(Math.random() * 8) | 0][(Math.random() * 8) | 0];
+
+      // reset attempt count
+      var attemptCount = document.getElementById('attemptCount');
+      attemptCount.innerHTML = 0;
+
+      // hide all entries
+      for (var node of nodes)
+        node.classList.remove('highlighted');
+    }
+
+    document.body.onload = reset;
+
+    var eventHandler = function(event) {
+      event.preventDefault();
+
+      if (event.target.classList.contains('highlighted')) {
+        return false;
+      }
+
+      event.target.classList.add('highlighted');
+
+      var entryId = +event.target.dataset.id;
+      event.target.innerHTML = entries[(entryId / 8) | 0][entryId % 8];
+
+      // increment attempt count
+      var attemptCount = document.getElementById('attemptCount');
+      var value = attemptCount.innerHTML; value++;
+      attemptCount.innerHTML = value;
+
+      var secretNumber = document.getElementById('secretNumber');
+
+      if (event.target.innerHTML === secretNumber.innerHTML) {
+        alert('Congratulations, you have solved the puzzle in ' + attemptCount.innerHTML + ' spell casts!');
+      }
+    }
+
+    nodes.forEach(function(node) {
+      node.addEventListener('click', eventHandler);
+    });
+  </script>
+</body>
