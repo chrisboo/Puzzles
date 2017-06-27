@@ -101,11 +101,11 @@
           if (i === 0 && j === 0) {
             entries[i][j] = (Math.random() * 3) | 0;
           } else if (i === 0) {
-            entries[i][j] = entries[i][j-1] + (Math.random() * 5) | 0;
+            entries[i][j] = entries[i][j-1] + (Math.random() * 10) | 0;
           } else if (j === 0) {
-            entries[i][j] = entries[i-1][j] + (Math.random() * 5) | 0;
+            entries[i][j] = entries[i-1][j] + (Math.random() * 10) | 0;
           } else {
-            entries[i][j] = Math.max(entries[i][j-1], entries[i-1][j]) + (Math.random() * 5) | 0;
+            entries[i][j] = Math.max(entries[i][j-1], entries[i-1][j]) + (Math.random() * 10) | 0;
           }
         }
       }
@@ -119,8 +119,10 @@
       attemptCount.innerHTML = 0;
 
       // hide all entries
-      for (var node of nodes)
+      for (var node of nodes) {
         node.classList.remove('highlighted');
+        node.innerHTML = "";
+      }
     }
 
     document.body.onload = reset;
